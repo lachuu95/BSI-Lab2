@@ -7,6 +7,18 @@ sys.path.append(os.path.abspath("."))
 from src.calculator import Calculator
 
 
+def test_calculator():
+    Calculator()
+    assert False
+
+
+@pytest.mark.xfail(raises=TypeError)
+@pytest.mark.parametrize("test_input_a", ["qwerty", 1, 1.15, True])
+def test_calculator_wrong(test_input_a):
+    Calculator(test_input_a)
+    assert False
+
+
 @pytest.mark.parametrize(
     "test_input_a, test_input_b, expected",
     [
@@ -127,3 +139,28 @@ def test_calculator_multiplication(test_input_a, test_input_b, expected):
 def test_calculator_division(test_input_a, test_input_b, expected):
     calc = Calculator()
     assert isclose(calc.division(test_input_a, test_input_b), expected, abs_tol=1e-10)
+
+
+@pytest.mark.parametrize(
+    "test_input_a, expected",
+    [(0, 1), (1, 1), (2, 2), (3, 6), (10, 3628800), (20, 2432902008176640000),],
+)
+def test_calculator_factorial(test_input_a, expected):
+    calc = Calculator()
+    assert calc.factorial(test_input_a) == expected
+
+
+@pytest.mark.parametrize(
+    "test_input_a, expected",
+    [
+        (0, 0),
+        (1, 1),
+        (2, 1.41421356237),
+        (3, 1.73205080756),
+        (10, 3.16227766016),
+        (20, 4.47213595499),
+    ],
+)
+def test_calculator_square_root(test_input_a, expected):
+    calc = Calculator()
+    assert isclose(calc.square_root(test_input_a), expected, abs_tol=1e-10)
