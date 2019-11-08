@@ -9,14 +9,18 @@ from src.calculator import Calculator
 
 def test_calculator():
     Calculator()
-    assert False
+    assert True
 
 
-@pytest.mark.xfail(raises=TypeError)
-@pytest.mark.parametrize("test_input_a", ["qwerty", 1, 1.15, True])
+@pytest.mark.parametrize("test_input_a", [None,"qwerty", 1, 1.15, True])
 def test_calculator_wrong(test_input_a):
-    Calculator(test_input_a)
-    assert False
+    with pytest.raises(TypeError):
+        Calculator(test_input_a)
+
+
+@pytest.fixture(scope="module", autouse=True)
+def get_class_object():
+    yield Calculator()
 
 
 @pytest.mark.parametrize(
@@ -42,11 +46,56 @@ def test_calculator_wrong(test_input_a):
             0.000000000000000000000000000000000004,
         ),
         (3, 1.5, 4.5),
+        (True, True, 2),
     ],
 )
-def test_calculator_addition(test_input_a, test_input_b, expected):
-    calc = Calculator()
-    assert calc.addition(test_input_a, test_input_b) == expected
+def test_calculator_addition(test_input_a, test_input_b, expected, get_class_object):
+    assert isclose(
+        get_class_object.addition(test_input_a, test_input_b), expected, abs_tol=1e-10,
+    )
+
+
+@pytest.mark.parametrize(
+    "test_input_a, test_input_b, expected",
+    [
+        (0, 0, 0),
+        (10, -25, -15),
+        (-2, -3, -5),
+        (5, 3, 8),
+        (1585416574651, 468516504186, 2053933078837),
+        (
+            -3524653413534854165135468848486,
+            -3598798768489748658746846879854,
+            -7123452182024602823882315728340,
+        ),
+        (0.0, 0.0, 0.0),
+        (1.52, 3.241, 4.761),
+        (-2.01, -0.365, -2.375),
+        (3.25, -1.25, 2),
+        (
+            0.000000000000000000000000000000000003,
+            0.000000000000000000000000000000000001,
+            0.000000000000000000000000000000000004,
+        ),
+        (3, 1.5, 4.5),
+        (True, True, 2),
+    ],
+)
+def test_calculator_addition(test_input_a, test_input_b, expected, get_class_object):
+    assert isclose(
+        get_class_object.addition(test_input_a, test_input_b), expected, abs_tol=1e-10,
+    )
+
+
+@pytest.mark.parametrize(
+    "test_input_a, test_input_b, expected",
+    [("A", 1, "A1"), (2, b"1", 3), (None, 1, 1), (2+3j, 3+2j, 5+5j), ],
+)
+def test_calculator_addition_wrong(test_input_a, test_input_b, expected, get_class_object):
+    with pytest.raises(TypeError):
+        assert isclose(
+            get_class_object.addition(test_input_a, test_input_b), expected, abs_tol=1e-10,
+        )
 
 
 @pytest.mark.parametrize(
@@ -74,11 +123,23 @@ def test_calculator_addition(test_input_a, test_input_b, expected):
         (3, 1.5, 1.5),
     ],
 )
-def test_calculator_subtraction(test_input_a, test_input_b, expected):
-    calc = Calculator()
+def test_calculator_subtraction(test_input_a, test_input_b, expected, get_class_object):
     assert isclose(
-        calc.subtraction(test_input_a, test_input_b), expected, abs_tol=1e-10
+        get_class_object.subtraction(test_input_a, test_input_b),
+        expected,
+        abs_tol=1e-10,
     )
+
+
+@pytest.mark.parametrize(
+    "test_input_a, test_input_b, expected",
+    [("A", 1, "A-1"), (2, b"1", 1), (None, 1, -1), (2+3j, 3+2j, -1+1j), ],
+)
+def test_calculator_subtraction_wrong(test_input_a, test_input_b, expected, get_class_object):
+    with pytest.raises(TypeError):
+        assert isclose(
+            get_class_object.subtraction(test_input_a, test_input_b), expected, abs_tol=1e-10,
+        )
 
 
 @pytest.mark.parametrize(
@@ -106,10 +167,13 @@ def test_calculator_subtraction(test_input_a, test_input_b, expected):
         (3, 1.5, 4.5),
     ],
 )
-def test_calculator_multiplication(test_input_a, test_input_b, expected):
-    calc = Calculator()
+def test_calculator_multiplication(
+    test_input_a, test_input_b, expected, get_class_object
+):
     assert isclose(
-        calc.multiplication(test_input_a, test_input_b), expected, abs_tol=1e-10
+        get_class_object.multiplication(test_input_a, test_input_b),
+        expected,
+        abs_tol=1e-10,
     )
 
 
@@ -136,18 +200,18 @@ def test_calculator_multiplication(test_input_a, test_input_b, expected):
         (3, 1.5, 2),
     ],
 )
-def test_calculator_division(test_input_a, test_input_b, expected):
-    calc = Calculator()
-    assert isclose(calc.division(test_input_a, test_input_b), expected, abs_tol=1e-10)
+def test_calculator_division(test_input_a, test_input_b, expected, get_class_object):
+    assert isclose(
+        get_class_object.division(test_input_a, test_input_b), expected, abs_tol=1e-10
+    )
 
 
 @pytest.mark.parametrize(
     "test_input_a, expected",
     [(0, 1), (1, 1), (2, 2), (3, 6), (10, 3628800), (20, 2432902008176640000),],
 )
-def test_calculator_factorial(test_input_a, expected):
-    calc = Calculator()
-    assert calc.factorial(test_input_a) == expected
+def test_calculator_factorial(test_input_a, expected, get_class_object):
+    assert get_class_object.factorial(test_input_a) == expected
 
 
 @pytest.mark.parametrize(
@@ -161,6 +225,5 @@ def test_calculator_factorial(test_input_a, expected):
         (20, 4.47213595499),
     ],
 )
-def test_calculator_square_root(test_input_a, expected):
-    calc = Calculator()
-    assert isclose(calc.square_root(test_input_a), expected, abs_tol=1e-10)
+def test_calculator_square_root(test_input_a, expected, get_class_object):
+    assert isclose(get_class_object.square_root(test_input_a), expected, abs_tol=1e-10)

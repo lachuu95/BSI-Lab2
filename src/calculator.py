@@ -41,7 +41,7 @@ class Calculator:
         self.__check_number(y)
 
     def __check_number(self, x):
-        if not isinstance(x, int) and not isinstance(x, float):
+        if not isinstance(x, (int, float)):
             raise TypeError(
                 f"Błędny typ danych, {x} jest {type(x)}. Oczekiwano int lub float."
             )
